@@ -3,6 +3,7 @@ const c = canvas.getContext('2d')
 
 canvas.width = 1024
 canvas.height = 576
+c.imageSmoothingEnabled = false
 
 c.fillRect(0, 0, canvas.width, canvas.height)
 
@@ -83,6 +84,35 @@ const enemy = new Fighter({
   offset: {
     x: -50,
     y: 0
+  },
+  imageSrc: './assets/kenji/Idle.png',
+  framesMax: 4,
+  scale: 2.5,
+  offset: {
+    x: 215,
+    y: 170
+  },
+  sprites: {
+    idle: {
+      imageSrc: './assets/kenji/Idle.png',
+      framesMax: 4 
+    },
+    run: {
+      imageSrc: './assets/kenji/Run.png',
+      framesMax: 8
+    },
+    jump: {
+      imageSrc: './assets/kenji/Jump.png',
+      framesMax: 2
+    },
+    fall: {
+      imageSrc: './assets/kenji/Fall.png',
+      framesMax: 2
+    },
+    attack1: {
+      imageSrc: './assets/kenji/Attack1.png',
+      framesMax: 4
+    }
   }
 })
 
@@ -141,10 +171,21 @@ function animate() {
   }
 
   // enemy movement
+
   if (keys.ArrowLeft.pressed && enemy.lastKey === 'ArrowLeft') {
     enemy.velocity.x = -5 // left
+    enemy.switchSprite('run')
   } else if (keys.ArrowRight.pressed && enemy.lastKey === 'ArrowRight') {
     enemy.velocity.x = 5 // right
+    enemy.switchSprite('run')
+  } else {
+    enemy.switchSprite('idle') // idle
+  }
+
+  if (enemy.velocity.y < 0) { // jumping
+    enemy.switchSprite('jump')
+  } else if (enemy.velocity.y > 0) {
+    enemy.switchSprite('fall') // falling
   }
 
   // detect collision 
