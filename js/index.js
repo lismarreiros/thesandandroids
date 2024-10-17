@@ -67,6 +67,14 @@ const player = new Fighter({
     attack1: {
       imageSrc: './assets/samuraiMack/Attack1.png',
       framesMax: 6
+    },
+    takeHit: {
+      imageSrc: './assets/samuraiMack/Take Hit - white silhouette.png',
+      framesMax: 4
+    },
+    death: {
+      imageSrc: './assets/samuraiMack/Death.png',
+      framesMax: 6
     }
   },
   attackBox: {
@@ -120,6 +128,14 @@ const enemy = new Fighter({
     attack1: {
       imageSrc: './assets/kenji/Attack1.png',
       framesMax: 4
+    },
+    takeHit: {
+      imageSrc: './assets/kenji/Take hit.png',
+      framesMax: 3
+    },
+    death: {
+      imageSrc: './assets/kenji/Death.png',
+      framesMax: 7
     }
   },
   attackBox: {
@@ -204,16 +220,16 @@ function animate() {
     enemy.switchSprite('fall') // falling
   }
 
-  // detect collision 
+  // detect collision & enemy gets hit
   if (rectangularCollision({ rectangle1: player, rectangle2: enemy }) && player.isAttacking && player.framesCurrent === 4) {
+    enemy.takeHit()
     player.isAttacking = false
-    enemy.health -= 20
     document.querySelector('#enemyHealth').style.width = enemy.health + '%'
   } 
 
   if (rectangularCollision({ rectangle1: enemy , rectangle2: player }) && enemy.isAttacking && enemy.framesCurrent === 2) {
+    player.takeHit()
     enemy.isAttacking = false
-    player.health -= 15
     document.querySelector('#playerHealth').style.width = player.health + '%'
   }
 
@@ -236,24 +252,29 @@ function animate() {
 animate()
 
 window.addEventListener('keydown', (e) => {
-  switch (e.key) {
-    case 'd': 
-      keys.d.pressed = true
-      player.lastKey = 'd'
-      break
-    case 'a': 
-      keys.a.pressed = true
-      player.lastKey = 'a'
-      break
-    case 'w': 
-      player.velocity.y = -20
-      player.lastKey = 'w'
-      break
-    case ' ': 
-      player.attack()
-      break
+  if (!player.dead) {
+    switch (e.key) {
+      case 'd': 
+        keys.d.pressed = true
+        player.lastKey = 'd'
+        break
+      case 'a': 
+        keys.a.pressed = true
+        player.lastKey = 'a'
+        break
+      case 'w': 
+        player.velocity.y = -20
+        player.lastKey = 'w'
+        break
+      case ' ': 
+        player.attack()
+        break
+    }
+  }
 
-    case 'ArrowRight': 
+  if (!enemy.dead) {
+    switch (e.key) {
+      case 'ArrowRight': 
       keys.ArrowRight.pressed = true
       enemy.lastKey = 'ArrowRight'
       break
@@ -266,6 +287,7 @@ window.addEventListener('keydown', (e) => {
       break
     case 'ArrowDown': 
       enemy.attack()
+    }
   }
 })
 
